@@ -1,0 +1,34 @@
+{
+  "name": "koa-storage",
+  "version": "1.0.0",
+  "description": "A simple storage system via koa",
+  "main": "app.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WeiZhiHuang/koa-storage.git"
+  },
+  "keywords": [
+    "koa",
+    "storage",
+    "very lite"
+  ],
+  "author": "WeiZhiHuang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WeiZhiHuang/koa-storage/issues"
+  },
+  "homepage": "https://github.com/WeiZhiHuang/koa-storage#readme",
+  "dependencies": {
+    "file-type": "^5.2.0",
+    "koa": "^2.3.0",
+    "koa-body": "^2.3.0",
+    "koa-logger": "^3.0.1",
+    "koa-static": "^4.0.1",
+    "read-chunk": "^2.1.0"
+  }
+}
