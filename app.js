@@ -39,19 +39,31 @@ app.use(async function(ctx, next) {
   // ignore non-POSTs
   if ('POST' != ctx.method) return await next();
 
-  const file = ctx.request.body.files.file;
-  const reader = fs.createReadStream(file.path);
+  let files = ctx.request.body.files.file;
+  if (files.length === undefined) {
+    files = [files];
+  }
 
-  const buffer = readChunk.sync(file.path, 0, 4100);
-  const ext = fileType(buffer) ? '.' + fileType(buffer).ext : '';
-  const fileName = Date.now().toString() + ext;
+  let result = [];
+  files.map((file) => {
+    const reader = fs.createReadStream(file.path);
 
-  // const stream = fs.createWriteStream(path.join(os.tmpdir(), Math.random().toString()));
-  const stream = fs.createWriteStream(path.join(__dirname, 'storage', fileName));
-  reader.pipe(stream);
-  console.log('uploading %s -> %s', file.name, stream.path);
+    const buffer = readChunk.sync(file.path, 0, 4100);
+    const ext = fileType(buffer) ? '.' + fileType(buffer).ext : '';
 
-  ctx.body = { url: ctx.request.href + fileName };
+    let filePath, fileName;
+    do {
+      fileName = Date.now().toString() + Math.random().toString(36).substring(2) + ext;
+      filePath = path.join(__dirname, 'storage', fileName);
+    } while (fs.existsSync(filePath));
+
+    const stream = fs.createWriteStream(filePath);
+    reader.pipe(stream);
+    console.log('uploading %s -> %s', file.name, stream.path);
+    result.push({origin: file.name, url: ctx.request.href + fileName});
+  });
+
+  ctx.body = result;
 });
 
 // handle downloads
