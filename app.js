@@ -45,22 +45,31 @@ app.use(async function(ctx, next) {
   }
 
   let result = [];
-  files.map((file) => {
+  files.map((file, key) => {
     const reader = fs.createReadStream(file.path);
 
     const buffer = readChunk.sync(file.path, 0, 4100);
     const ext = fileType(buffer) ? '.' + fileType(buffer).ext : '';
 
     let filePath, fileName;
-    do {
-      fileName = Date.now().toString() + Math.random().toString(36).substring(2) + ext;
-      filePath = path.join(__dirname, 'storage', fileName);
-    } while (fs.existsSync(filePath));
+    if (ctx.request.url === '/') {
+        do {
+          fileName = Date.now().toString() + Math.random().toString(36).substring(2) + ext;
+          filePath = path.join(__dirname, 'storage', fileName);
+        } while (fs.existsSync(filePath));
+    } else {
+        fileName = ctx.request.url + (files.length === 1 ? '' : key )
+        filePath = path.join(__dirname, 'storage', fileName);
+        if (fs.existsSync(filePath) && !ctx.request.body.fields.override) {
+            ctx.throw(403, 'file exists');
+        }
+    }
 
     const stream = fs.createWriteStream(filePath);
     reader.pipe(stream);
     console.log('uploading %s -> %s', file.name, stream.path);
-    result.push({origin: file.name, url: ctx.request.href + fileName});
+    const url = ctx.request.href + (ctx.request.url === '/' ? fileName : key);
+    result.push({origin: file.name, url: url});
   });
 
   ctx.body = result;
