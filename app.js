@@ -53,22 +53,26 @@ app.use(async function(ctx, next) {
 
     let filePath, fileName;
     if (ctx.request.url === '/') {
-        do {
-          fileName = Date.now().toString() + Math.random().toString(36).substring(2) + ext;
-          filePath = path.join(__dirname, 'storage', fileName);
-        } while (fs.existsSync(filePath));
-    } else {
-        fileName = ctx.request.url + (files.length === 1 ? '' : key )
+      // create a random file name until not in use
+      do {
+        fileName = Date.now().toString() + Math.random().toString(36).substring(2) + ext;
         filePath = path.join(__dirname, 'storage', fileName);
-        if (fs.existsSync(filePath) && !ctx.request.body.fields.override) {
-            ctx.throw(403, 'file exists');
-        }
+      } while (fs.existsSync(filePath));
+    } else {
+      fileName = ctx.request.url;
+      fileName += files.length === 1 ? '' : key;
+      filePath = path.join(__dirname, 'storage', fileName);
+      if (fs.existsSync(filePath) && !ctx.request.body.fields.override) {
+          ctx.throw(403, 'file exists');
+      }
     }
 
     const stream = fs.createWriteStream(filePath);
     reader.pipe(stream);
     console.log('uploading %s -> %s', file.name, stream.path);
-    const url = ctx.request.href + (ctx.request.url === '/' ? fileName : key);
+    let url = ctx.request.href;
+    url += ctx.request.url === '/' ? fileName : '';
+    url += files.length === 1 ? '' : key;
     result.push({origin: file.name, url: url});
   });
 
