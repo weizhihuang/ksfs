@@ -71,8 +71,11 @@ app.use(async function(ctx, next) {
     reader.pipe(stream);
     console.log('uploading %s -> %s', file.name, stream.path);
     let url = ctx.request.href;
-    url += ctx.request.url === '/' ? fileName : '';
-    url += files.length === 1 ? '' : key;
+    if (ctx.request.url === '/') { // if named
+      url += fileName;
+    } else if (files.length) { // if unamed and file > 1
+      url += key;
+    }
     result.push({origin: file.name, url: url});
   });
 
