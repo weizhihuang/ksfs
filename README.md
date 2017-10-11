@@ -35,7 +35,7 @@
 ### Upload named file
 When you upload a file to such like /filename, you will get a response /filename.
 
-Then when you upload two(or more) files to /manyfiles, you will get a response that include /manyfiles0 and /manyfiles1.
+Then when you upload two(or more) files to /manyfiles, you will get a response that include /manyfiles_0 and /manyfiles_1.
 
 ### Override
 Otherwise, maybe you will see status 403 and its response is "file exists".
