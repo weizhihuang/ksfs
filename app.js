@@ -73,7 +73,7 @@ app.use(async function(ctx, next) {
     let url = ctx.request.href;
     if (ctx.request.url === '/') { // if named
       url += fileName;
-    } else if (files.length) { // if unamed and file > 1
+    } else if (files.length > 1) { // if unamed and file > 1
       url += key;
     }
     result.push({origin: file.name, url: url});
