@@ -33,13 +33,13 @@
 ## Note
 
 ### Upload named file
-When you upload a file to such like /filename, you will get a response /filename.
+When you upload a file to such like /filename, you will get a url /filename.
 
-Then when you upload two(or more) files to /manyfiles, you will get a response that include /manyfiles_0 and /manyfiles_1.
+Then when you upload two(or more) files to /multiplefiles, you will get a response that include /multiplefiles_0 and /multiplefiles_1.
 
 ### Override
-Otherwise, maybe you will see status 403 and its response is "file exists".
-It's actually that the file name already exists, maybe you can add a param named "override".
+Otherwise, maybe you will see status 403 and its message is "file exists".
+It's actually that the file has same name already exists, maybe you can add a param named "override".
 
 ### File types
 About file types, you need to reference that: https://github.com/sindresorhus/file-type#supported-file-types
