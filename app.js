@@ -19,11 +19,16 @@ const send = require('koa-send');
 
 app.use(logger());
 
-app.use(koaBody({ multipart: true }));
+app.use(koaBody({
+  multipart: true,
+  formidable: {
+    maxFileSize: 10 * 1024 * 1024
+  }
+}));
 
 // custom 404
 
-app.use(async function(ctx, next) {
+app.use(async function (ctx, next) {
   await next();
   if (ctx.body || !ctx.idempotent) return;
   ctx.redirect('/404.html');
@@ -35,7 +40,7 @@ app.use(serve(path.join(__dirname, '/public')));
 
 // handle uploads
 
-app.use(async function(ctx, next) {
+app.use(async function (ctx, next) {
   // ignore non-POSTs
   if ('POST' != ctx.method) return await next();
 
@@ -63,7 +68,7 @@ app.use(async function(ctx, next) {
       fileName += files.length === 1 ? '' : `_${key}`;
       filePath = path.join(__dirname, 'storage', fileName);
       if (fs.existsSync(filePath) && !ctx.request.body.fields.override) {
-          ctx.throw(403, 'file exists');
+        ctx.throw(403, 'file exists');
       }
     }
 
@@ -76,7 +81,7 @@ app.use(async function(ctx, next) {
     } else if (files.length > 1) { // if unamed and file > 1
       url += `_${key}`;
     }
-    result.push({origin: file.name, url: url});
+    result.push({ origin: file.name, url: url });
   });
 
   ctx.body = result;
