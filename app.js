@@ -54,9 +54,16 @@ app.use(async function (ctx, next) {
     const reader = fs.createReadStream(file.path);
 
     const buffer = readChunk.sync(file.path, 0, 4100);
-    const ext = fileType(buffer) ? '.' + fileType(buffer).ext : '';
+    let ext, filePath, fileName;
 
-    let filePath, fileName;
+    if (fileType(buffer)) {
+      ext = `.${fileType(buffer).ext}`;
+    } else if (file.name.includes('.')) {
+      ext = `.${file.name.split('.').pop()}`;
+    } else {
+      ext = '';
+    }
+
     if (ctx.request.url === '/') {
       // create a random file name until not in use
       do {
