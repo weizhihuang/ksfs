@@ -65,11 +65,19 @@ app.use(async function (ctx, next) {
     }
 
     if (ctx.request.url === '/') {
-      // create a random file name until not in use
-      do {
-        fileName = Date.now().toString() + Math.random().toString(36).substring(2) + ext;
+      if (ctx.request.body.fields['origin-name']) {
+        fileName = file.name;
         filePath = path.join(__dirname, 'storage', fileName);
-      } while (fs.existsSync(filePath));
+        if (fs.existsSync(filePath)) {
+          ctx.throw(403, 'file exists');
+        }
+      } else {
+        // create a random file name until not in use
+        do {
+          fileName = Date.now().toString() + Math.random().toString(36).substring(2) + ext;
+          filePath = path.join(__dirname, 'storage', fileName);
+        } while (fs.existsSync(filePath));
+      }
     } else {
       fileName = ctx.request.url;
       fileName += files.length === 1 ? '' : `_${key}`;
