@@ -42,7 +42,7 @@ app.use(serve(path.join(__dirname, '/public')));
 
 app.use(async function (ctx, next) {
   // ignore non-POSTs
-  if ('POST' != ctx.method) return await next();
+  if (ctx.method !== 'POST') return await next();
 
   let files = ctx.request.body.files.file;
   if (files.length === undefined) {
