@@ -45,7 +45,7 @@ app.use(async function (ctx, next) {
   if (ctx.method !== 'POST') return await next();
 
   let files = ctx.request.body.files.file;
-  if (files.length === undefined) {
+  if (!files.length) {
     files = [files];
   }
 
