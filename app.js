@@ -44,7 +44,7 @@ app.use(async function (ctx, next) {
   // ignore non-POSTs
   if (ctx.method !== 'POST') return await next();
 
-  let files = ctx.request.body.files.file;
+  let files = ctx.request.files.file;
   if (files.length === undefined) {
     files = [files];
   }
