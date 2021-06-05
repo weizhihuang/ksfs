@@ -104,7 +104,7 @@ app.use(async function (ctx, next) {
 
 app.use(async (ctx, next) => {
   if (ctx.request.url !== '/list') return await next();
-  
+
   ctx.body = ['/', ...fs.readdirSync(__dirname + '/storage')]
     .filter(path => path[0] !== '.')
     .map(path => `<a href="${path}">${path}</a>`)
