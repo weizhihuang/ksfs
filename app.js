@@ -12,7 +12,7 @@ const app = new Koa();
 const os = require('os');
 const path = require('path');
 const readChunk = require('read-chunk');
-const fileType = require('file-type');
+const fileType = require('file-type-ext');
 const send = require('koa-send');
 
 // log requests
@@ -58,10 +58,8 @@ app.use(async function (ctx, next) {
 
     if (fileType(buffer)) {
       ext = `.${fileType(buffer).ext}`;
-    } else if (file.name.includes('.')) {
-      ext = `.${file.name.split('.').pop()}`;
     } else {
-      ext = '';
+      ext = file.name.includes('.') ? `.${file.name.split('.').pop()}` : '';
     }
 
     if (ctx.request.url === '/') {

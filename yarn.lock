@@ -111,9 +111,17 @@ escape-string-regexp@^1.0.2:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
 
-file-type@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/file-type/-/file-type-5.2.0.tgz#2ddbea7c73ffe36368dfae49dc338c058c2b8ad6"
+file-type-ext@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/file-type-ext/-/file-type-ext-1.0.1.tgz#23b8788e98c0006b05766cea551de299dd733224"
+  integrity sha512-0969F1nbimZU48sZq7fFgLG4FvOh3IXYNY7by6/3tT1RHfxgb3XdmJ+jnxVar2FYqBn5bKKBZWeMyv//LCEo7Q==
+  dependencies:
+    file-type "^12.0.0"
+
+file-type@^12.0.0:
+  version "12.4.2"
+  resolved "https://registry.yarnpkg.com/file-type/-/file-type-12.4.2.tgz#a344ea5664a1d01447ee7fb1b635f72feb6169d9"
+  integrity sha512-UssQP5ZgIOKelfsaB5CuGAL+Y+q7EmONuiwF3N5HAH0t27rvrttgi6Ra9k/+DVaY9UF6+ybxu5pOXLUdA8N7Vg==
 
 formidable@1.1.1:
   version "1.1.1"
