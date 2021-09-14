@@ -4,6 +4,7 @@ const koaBody = require('koa-body');
 const send = require('koa-send');
 const Koa = require('koa');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const readChunk = require('read-chunk');
 const fileType = require('file-type-ext');
@@ -13,6 +14,9 @@ const app = new Koa();
 
 
 const port = argv.p || argv.port || parseInt(process.env.PORT, 10);
+const host = argv.a || '0.0.0.0';
+
+const ifaces = os.networkInterfaces();
 
 
 app.use(logger());
@@ -98,12 +102,27 @@ app.use(async (ctx) => {
 });
 
 if (port) {
-  app.listen(port);
-  console.info('listening on port ' + port);
+  listen(port);
 } else {
   portfinder.getPort({ port: 3000 }, (err, port) => {
     if (err) throw err;
-    app.listen(port);
-    console.info('listening on port ' + port);
+    listen(port);
   });
+}
+
+const listen = (port) => {
+  app.listen(port, host);
+
+  console.info('\nAvailable on:');
+  if (host === '0.0.0.0') {
+    Object.keys(ifaces).forEach(dev => {
+      ifaces[dev].forEach(details => {
+        if (details.family === 'IPv4') {
+          console.info(`  http://${details.address}${port === 80 ? '' : ':' + port}`);
+        }
+      });
+    });
+  } else {
+    console.info(`  http://${host}${port === 80 ? '' : ':' + port}`);
+  }
 }
