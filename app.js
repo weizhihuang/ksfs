@@ -1,13 +1,14 @@
 const logger = require('koa-logger');
 const serve = require('koa-static');
 const koaBody = require('koa-body');
+const send = require('koa-send');
 const Koa = require('koa');
 const fs = require('fs');
-const app = new Koa();
 const path = require('path');
 const readChunk = require('read-chunk');
 const fileType = require('file-type-ext');
-const send = require('koa-send');
+const portfinder = require('portfinder')
+const app = new Koa();
 
 
 app.use(logger());
@@ -92,5 +93,10 @@ app.use(async (ctx) => {
   await send(ctx, ctx.path, { root: __dirname + '/storage' });
 });
 
-app.listen(3000);
-console.info('listening on port 3000');
+portfinder.basePort = 3000;
+portfinder.highestPort = 3000; //
+portfinder.getPort((err, port) => {
+  if (err) throw `address already in use :::3000`; //
+  app.listen(port);
+  console.info('listening on port ' + port);
+});
