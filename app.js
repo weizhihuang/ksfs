@@ -8,7 +8,11 @@ const path = require('path');
 const readChunk = require('read-chunk');
 const fileType = require('file-type-ext');
 const portfinder = require('portfinder')
+const argv = require('minimist')(process.argv.slice(2));
 const app = new Koa();
+
+
+const port = argv.p || argv.port || parseInt(process.env.PORT, 10);
 
 
 app.use(logger());
@@ -93,10 +97,13 @@ app.use(async (ctx) => {
   await send(ctx, ctx.path, { root: __dirname + '/storage' });
 });
 
-portfinder.basePort = 3000;
-portfinder.highestPort = 3000; //
-portfinder.getPort((err, port) => {
-  if (err) throw `address already in use :::3000`; //
+if (port) {
   app.listen(port);
   console.info('listening on port ' + port);
-});
+} else {
+  portfinder.getPort({ port: 3000 }, (err, port) => {
+    if (err) throw err;
+    app.listen(port);
+    console.info('listening on port ' + port);
+  });
+}
