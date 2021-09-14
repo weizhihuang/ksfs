@@ -116,9 +116,9 @@ const listen = (port) => {
   console.info('\nAvailable on:');
   if (host === '0.0.0.0') {
     Object.keys(ifaces).forEach(dev => {
-      ifaces[dev].forEach(details => {
-        if (details.family === 'IPv4') {
-          console.info(`  http://${details.address}${port === 80 ? '' : ':' + port}`);
+      ifaces[dev].forEach(({ address, family }) => {
+        if (family === 'IPv4') {
+          console.info(`  http://${address}${port === 80 ? '' : ':' + port}`);
         }
       });
     });
