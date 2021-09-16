@@ -10,11 +10,12 @@ const readChunk = require('read-chunk');
 const fileType = require('file-type-ext');
 const portfinder = require('portfinder')
 const argv = require('minimist')(process.argv.slice(2));
+const opener = require('opener');
 const app = new Koa();
 
 
 const port = argv.p || argv.port || parseInt(process.env.PORT, 10);
-const host = argv.a || '0.0.0.0';
+const host = argv.a;
 
 const ifaces = os.networkInterfaces();
 
@@ -101,20 +102,13 @@ app.use(async (ctx) => {
   await send(ctx, ctx.path, { root: __dirname + '/storage' });
 });
 
-if (port) {
-  listen(port);
-} else {
-  portfinder.getPort({ port: 3000 }, (err, port) => {
-    if (err) throw err;
-    listen(port);
-  });
-}
-
 const listen = (port) => {
   app.listen(port, host);
 
   console.info('\nAvailable on:');
-  if (host === '0.0.0.0') {
+  if (host) {
+    console.info(`  http://${host}${port === 80 ? '' : ':' + port}`);
+  } else {
     Object.keys(ifaces).forEach(dev => {
       ifaces[dev].forEach(({ address, family }) => {
         if (family === 'IPv4') {
@@ -122,7 +116,18 @@ const listen = (port) => {
         }
       });
     });
-  } else {
-    console.info(`  http://${host}${port === 80 ? '' : ':' + port}`);
   }
+
+  if (argv.o) {
+    opener(`http://${host || '127.0.0.1'}:${port}`);
+  }
+}
+
+if (port) {
+  listen(port);
+} else {
+  portfinder.getPort({ port: 3000 }, (err, port) => {
+    if (err) throw err;
+    listen(port);
+  });
 }
