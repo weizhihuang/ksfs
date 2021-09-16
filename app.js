@@ -102,24 +102,27 @@ app.use(async (ctx) => {
   await send(ctx, ctx.path, { root: __dirname + '/storage' });
 });
 
+
+const urlInfo = (host, port) => {
+  console.info(`  http://${/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host) ? host : '['+host+']'}${port === 80 ? '' : ':' + port}`)
+}
+
 const listen = (port) => {
   app.listen(port, host);
 
   console.info('\nAvailable on:');
   if (host) {
-    console.info(`  http://${host}${port === 80 ? '' : ':' + port}`);
+    urlInfo(host, port);
   } else {
     Object.keys(ifaces).forEach(dev => {
       ifaces[dev].forEach(({ address, family }) => {
-        if (family === 'IPv4') {
-          console.info(`  http://${address}${port === 80 ? '' : ':' + port}`);
-        }
+        if (family === 'IPv4') urlInfo(address, port);
       });
     });
   }
 
   if (argv.o) {
-    opener(`http://${host || '127.0.0.1'}:${port}`);
+    opener(`http://${host || '[::1]'}:${port}`);
   }
 }
 
