@@ -352,6 +352,11 @@ only@0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/only/-/only-0.0.2.tgz#2afde84d03e50b9a8edc444e30610a70295edfb4"
 
+opener@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/opener/-/opener-1.5.2.tgz#5d37e1f35077b9dcac4301372271afdeb2a13598"
+  integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
+
 parseurl@^1.3.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.1.tgz#c8ab8c9223ba34888aa64a297b28853bec18da56"
