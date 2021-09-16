@@ -121,7 +121,7 @@ const listen = (port) => {
     });
   }
 
-  if (argv.o) {
+  if (argv.open) {
     opener(`http://${host || '[::1]'}:${port}`);
   }
 }
