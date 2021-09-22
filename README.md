@@ -1,4 +1,4 @@
-# KOA STORAGE
+# Koa Storage
 > A simple storage system build with koa
 
 ## Usage (API)
