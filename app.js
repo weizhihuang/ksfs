@@ -10,11 +10,12 @@ const readChunk = require('read-chunk');
 const fileType = require('file-type-ext');
 const portfinder = require('portfinder')
 const argv = require('minimist')(process.argv.slice(2));
+const opener = require('opener');
 const app = new Koa();
 
 
 const port = argv.p || argv.port || parseInt(process.env.PORT, 10);
-const host = argv.a || '0.0.0.0';
+const host = argv.a;
 
 const ifaces = os.networkInterfaces();
 
@@ -90,6 +91,7 @@ app.use(async function (ctx, next) {
 
 app.use(async (ctx, next) => {
   if (ctx.request.url !== '/list') return await next();
+  if (argv.list === false) ctx.throw(403, 'list disabled');
 
   ctx.body = ['/', ...fs.readdirSync(__dirname + '/storage')]
     .filter(path => path[0] !== '.')
@@ -101,6 +103,30 @@ app.use(async (ctx) => {
   await send(ctx, ctx.path, { root: __dirname + '/storage' });
 });
 
+
+const urlInfo = (host, port) => {
+  console.info(`  http://${/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host) ? host : '['+host+']'}${port === 80 ? '' : ':' + port}`)
+}
+
+const listen = (port) => {
+  app.listen(port, host);
+
+  console.info('\nAvailable on:');
+  if (host) {
+    urlInfo(host, port);
+  } else {
+    Object.keys(ifaces).forEach(dev => {
+      ifaces[dev].forEach(({ address, family }) => {
+        if (family === 'IPv4') urlInfo(address, port);
+      });
+    });
+  }
+
+  if (argv.open) {
+    opener(`http://${host || '[::1]'}:${port}`);
+  }
+}
+
 if (port) {
   listen(port);
 } else {
@@ -108,21 +134,4 @@ if (port) {
     if (err) throw err;
     listen(port);
   });
-}
-
-const listen = (port) => {
-  app.listen(port, host);
-
-  console.info('\nAvailable on:');
-  if (host === '0.0.0.0') {
-    Object.keys(ifaces).forEach(dev => {
-      ifaces[dev].forEach(({ address, family }) => {
-        if (family === 'IPv4') {
-          console.info(`  http://${address}${port === 80 ? '' : ':' + port}`);
-        }
-      });
-    });
-  } else {
-    console.info(`  http://${host}${port === 80 ? '' : ':' + port}`);
-  }
 }
