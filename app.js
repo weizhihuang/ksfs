@@ -11,13 +11,12 @@ const fileType = require('file-type-ext');
 const portfinder = require('portfinder')
 const argv = require('minimist')(process.argv.slice(2));
 const opener = require('opener');
-const app = new Koa();
 
+const app = new Koa();
+const ifaces = os.networkInterfaces();
 
 const port = argv.p || argv.port || parseInt(process.env.PORT, 10);
 const host = argv.a;
-
-const ifaces = os.networkInterfaces();
 
 
 app.use(logger());
@@ -28,7 +27,7 @@ app.use(koaBody({
   }
 }));
 
-app.use(async function (ctx, next) {
+app.use(async (ctx, next) => {
   await next();
   if (ctx.body || !ctx.idempotent) return;
   ctx.redirect('/404.html');
@@ -36,7 +35,7 @@ app.use(async function (ctx, next) {
 
 app.use(serve(path.join(__dirname, '/public')));
 
-app.use(async function (ctx, next) {
+app.use(async (ctx, next) => {
   if (ctx.method !== 'POST') return await next();
 
   let files = ctx.request.body.files.file;
@@ -104,11 +103,16 @@ app.use(async (ctx) => {
 });
 
 
-const urlInfo = (host, port) => {
-  console.info(`  http://${/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host) ? host : '['+host+']'}${port === 80 ? '' : ':' + port}`)
+if (port) {
+  listen(port);
+} else {
+  portfinder.getPort({ port: 3000 }, (err, port) => {
+    if (err) throw err;
+    listen(port);
+  });
 }
 
-const listen = (port) => {
+function listen (port) {
   app.listen(port, host);
 
   console.info('\nAvailable on:');
@@ -127,11 +131,6 @@ const listen = (port) => {
   }
 }
 
-if (port) {
-  listen(port);
-} else {
-  portfinder.getPort({ port: 3000 }, (err, port) => {
-    if (err) throw err;
-    listen(port);
-  });
+function urlInfo(host, port) {
+  console.info(`  http://${/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host) ? host : '['+host+']'}${port === 80 ? '' : ':' + port}`)
 }
