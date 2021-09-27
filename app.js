@@ -28,12 +28,29 @@ app.use(koaBody({
 }));
 
 app.use(async (ctx, next) => {
-  await next();
+  try {
+    await next();
+  } catch (error) {
+    ctx.throw(error.status || 500, error.msg);
+  }
+
   if (ctx.body || !ctx.idempotent) return;
   ctx.redirect('/404.html');
 });
 
 app.use(serve(path.join(__dirname, '/public')));
+
+app.use(async (ctx, next) => {
+  if (ctx.path !== '/list') return await next();
+  if (argv.list === false) ctx.redirect('/404.html');
+  if (ctx.method !== 'GET') ctx.throw(405);
+
+  ctx.body = ['/']
+    .concat(fs.readdirSync(__dirname + '/storage'))
+    .filter(path => path[0] !== '.')
+    .map(path => `<a href="${path}">${path}</a>`)
+    .join('<br>');
+});
 
 app.use(async (ctx, next) => {
   if (ctx.method !== 'POST') return await next();
@@ -44,41 +61,35 @@ app.use(async (ctx, next) => {
   const result = [];
   files.map((file, key) => {
     const reader = fs.createReadStream(file.path);
-    const buffer = readChunk.sync(file.path, 0, 4100);
     let filePath, fileName;
-    let ext = fileType(buffer)?.ext || '';
 
-    if (file.name.includes('.') && (!ext || ext === 'zip')) {
-      ext = file.name.split('.').pop();
-    }
-
-    if (ctx.request.url === '/') {
+    if (ctx.path === '/') {
       if (ctx.request.body.fields['origin_name']) {
         fileName = file.name;
-        filePath = path.join(__dirname, 'storage', fileName);
-        if (fs.existsSync(filePath)) {
-          ctx.throw(403, 'file exists');
-        }
+        filePath = createFilePath(fileName);
       } else {
+        let ext = fileType(readChunk.sync(file.path, 0, 4100))?.ext;
+        if (file.name.includes('.') && (!ext || ext === 'zip')) {
+          ext = file.name.split('.').pop();
+        }
+
         do {
-          fileName = Date.now().toString() + Math.random().toString(36).substring(2) + (ext && '.' + ext);
-          filePath = path.join(__dirname, 'storage', fileName);
-        } while (fs.existsSync(filePath));
+          fileName = Date.now().toString() + Math.random().toString(36).substring(2) + (ext && '.' + ext || '');
+          filePath = createFilePath(fileName, false, false);
+        } while (!filePath);
       }
     } else {
-      fileName = ctx.request.url;
+      fileName = ctx.path;
       fileName += files.length === 1 ? '' : `_${key}`;
-      filePath = path.join(__dirname, 'storage', fileName);
-      if (fs.existsSync(filePath) && !ctx.request.body.fields.override) {
-        ctx.throw(403, 'file exists');
-      }
+      filePath = createFilePath(fileName, ctx.request.body.fields.override);
     }
 
     const stream = fs.createWriteStream(filePath);
     reader.pipe(stream);
     console.log('uploading %s -> %s', file.name, stream.path);
-    let url = ctx.request.href;
-    if (ctx.request.url === '/') {
+
+    let url = ctx.href;
+    if (ctx.path === '/') {
       url += fileName;
     } else if (files.length > 1) {
       url += `_${key}`;
@@ -86,16 +97,6 @@ app.use(async (ctx, next) => {
     result.push({ origin: file.name, target: url });
   });
   ctx.body = result;
-});
-
-app.use(async (ctx, next) => {
-  if (ctx.request.url !== '/list') return await next();
-  if (argv.list === false) ctx.redirect('/404.html');
-
-  ctx.body = ['/', ...fs.readdirSync(__dirname + '/storage')]
-    .filter(path => path[0] !== '.')
-    .map(path => `<a href="${path}">${path}</a>`)
-    .join('<br>');
 });
 
 app.use(async (ctx) => {
@@ -133,4 +134,17 @@ function listen (port) {
 
 function urlInfo(host, port) {
   console.info(`  http://${/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host) ? host : '['+host+']'}${port === 80 ? '' : ':' + port}`)
+}
+
+function createFilePath(name, override = false, strict = true) {
+  if (name[0] === '.' || name === 'list') throw { status: 403, msg: 'Illegal File Name' };
+
+  filePath = path.join(__dirname, 'storage', name);
+  if (fs.existsSync(filePath) && !override) {
+    if (strict)
+      throw { status: 409, msg: 'File Exists' };
+    return false;
+  }
+
+  return filePath;
 }
