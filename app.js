@@ -90,7 +90,7 @@ app.use(async (ctx, next) => {
 
 app.use(async (ctx, next) => {
   if (ctx.request.url !== '/list') return await next();
-  if (argv.list === false) ctx.throw(403, 'list disabled');
+  if (argv.list === false) ctx.redirect('/404.html');
 
   ctx.body = ['/', ...fs.readdirSync(__dirname + '/storage')]
     .filter(path => path[0] !== '.')
