@@ -1,44 +1,43 @@
-# Koa Storage
-> A simple storage system build with koa
+# Koa Simple File Sharing Service
+> Simple http-based file sharing service built with Koa.
 
 ## Usage (API)
 
-| Method | URI     | Remark                           |
-| ------ | ------- | -------------------------------- |
-| GET    | /       | index                            |
-| GET    | /{name} | download a file                  |
-| POST   | /       | upload a unnamed file (or files) |
-| POST   | /{name} | upload a named file (or files)   |
+| Method | Path    | Remark                 |
+| ------ | ------- | ---------------------- |
+| GET    | /       | Upload Page            |
+| GET    | /{name} | Download a File        |
+| POST   | /       | Upload Unnamed file(s) |
+| POST   | /{name} | Upload Named file(s)   |
 
-### Params
-| Name     | Type | Remark    |
-| -------- | ---- | --------- |
-| file     | File |           |
-| override | Bool | see above |
+### Parameters
+| Name     | Type | Remark |
+| -------- | ---- | ------ |
+| file     | File |        |
+| override | Bool |        |
 
 ### Response
 ```
 [
     {
         "origin": "file1.txt",
-        "target": "http://localhost:3000/1507001873310ckqrbtbwawa"
+        "target": "http://{url}/1507001873310ckqrbtbwawa"
     },
     {
         "origin": "file2",
-        "target": "http://localhost:3000/15070018733102c7moc3c7yp"
+        "target": "http://{url}/15070018733102c7moc3c7yp"
     },...
 ]
 ```
 
-## Note
-### Upload named file
-When uploading a file to /filename, you will get a target url /filename.
+## Advanced
+### Upload Named file(s)
+When uploading a file to /{name}, you will get a target url with {name}.
 
-When uploading two (or more) files to /multiplefiles, you will get a with target urls /multiplefiles_0, /multiplefiles_1, etc.
+When uploading two (or more) files to /{name}, you will get target urls with {name}_0, /{name}_1, etc.
 
 ### Override
-It may occur status 403 when the target file exists.
-Adding "override" param to update the target file.
+When the target file exists, status 403 may appear, add the **override** parameter to replace the target file **IF YOU WANT**.
 
-### File types
-About file types, you need to reference this: https://github.com/sindresorhus/file-type#supported-file-types.
+### File Types
+For file types, please refer to https://github.com/sindresorhus/file-type#supported-file-types.
