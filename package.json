@@ -1,28 +1,26 @@
 {
-  "name": "koa-storage",
+  "name": "ksfs",
   "version": "1.0.0",
-  "description": "A simple storage system via koa",
+  "description": "Simple http-based file sharing service built with Koa",
   "main": "app.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WeiZhiHuang/koa-storage.git"
+    "url": "git+https://github.com/weizhihuang/koa-storage.git"
   },
   "keywords": [
     "koa",
-    "storage",
-    "very lite"
+    "storage"
   ],
-  "author": "WeiZhiHuang",
+  "author": "weizhihuang",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/WeiZhiHuang/koa-storage/issues"
+    "url": "https://github.com/weizhihuang/ksfs/issues"
   },
-  "homepage": "https://github.com/WeiZhiHuang/koa-storage#readme",
+  "homepage": "https://github.com/weizhihuang/ksfs#readme",
   "dependencies": {
     "file-type-ext": "^1.0.1",
     "koa": "^2.3.0",
