@@ -1,5 +1,5 @@
 # Koa Simple File Sharing Service
-> Simple http-based file sharing service built with Koa.
+> Simple http-based file sharing service built with Koa
 
 ## Usage (API)
 
