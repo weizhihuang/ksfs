@@ -30,8 +30,8 @@ app.use(koaBody({
 app.use(async (ctx, next) => {
   try {
     await next();
-  } catch (error) {
-    ctx.throw(error.status || 500, error.msg);
+  } catch ({ status = 500, msg = 'Internal Server Error' }) {
+    ctx.throw(status, msg);
   }
 
   if (ctx.body || !ctx.idempotent) return;
